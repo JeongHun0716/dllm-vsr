@@ -1,0 +1,12 @@
+_target_: espnet.nets.pytorch_backend.e2e_asr_transformer.E2E
+odim: 1049
+idim: 512
+adim: 768
+aheads: 12
+eunits: 3072
+elayers: 12
+ddim: ${model.backbone.adim}
+dheads: ${model.backbone.aheads}
+dunits: ${model.backbone.eunits}
+dlayers: 6
+gamma_init: 0.1

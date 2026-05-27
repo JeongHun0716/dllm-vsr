@@ -1,0 +1,100 @@
+wandb:
+  resume: auto
+  mode: offline
+experiment:
+  project: dllm-vsr
+  name: lrs3_avhubert_dream_v2
+  output_dir: exp/runs/lrs3_avhubert_dream_v2
+  save_every: 250
+  eval_every: 250
+  generate_every: 250
+  log_every: 20
+  log_grad_norm_every: 100
+  resume_from_checkpoint: false
+  # warm-start from stage1 (oracle, no PAD-in-loss) ckpt.
+  finetune_from: exp/runs/lrs3_avhubert_dream/checkpoint-16000
+model:
+  # stage1 convention: variable-length transcript+EOS (no fixed max_seq_len padding).
+  use_oracle_length: true
+  # Standard multimodal dLLM (Dream) training: *no* forced first-EOS masking.
+  force_first_eos_mask: false
+  # Tail PAD slots from batch alignment become loss targets (natural pad training);
+  # PAD ratio bounded by (batch max − sample len) unlike fixed-length pad-loss.
+  train_batch_pad_loss: true
+  visual_encoder:
+    type: avhubert
+    ckpt_path: ckpt/avhubert/large_vox_iter5.pt
+    enc_dim: 1024
+  adapter:
+    kernel: 2
+    stride: 2
+    num_fc_layers: 2
+  dllm:
+    type: dream
+    pretrained_model_path: Dream-org/Dream-v0-Instruct-7B
+    tokenizer_path: Dream-org/Dream-v0-Instruct-7B
+    hidden_size: 3584
+  lora:
+    enable: true
+    r: 16
+    alpha: 32
+    dropout: 0.05
+    target_modules: all-linear
+  torch_dtype: bfloat16
+  gradient_checkpointing: true
+dataset:
+  task_type: vsr
+  backend: raw
+  vsr:
+    manifest_root: manifest/433h
+    max_video_frames: 500
+    modalities:
+    - video
+  raw_video:
+    crop_size: 88
+    normalize_mean: 0.421
+    normalize_std: 0.165
+    time_mask_window: 10
+    time_mask_stride: 25
+  dataloader:
+    num_workers: 4
+    pin_memory: true
+    persistent_workers: true
+optimizer:
+  name: adamw
+  params:
+    learning_rate: 5.0e-5
+    scale_lr: false
+    beta1: 0.9
+    beta2: 0.999
+    weight_decay: 0.01
+    epsilon: 1.0e-08
+lr_scheduler:
+  scheduler: cosine
+  params:
+    learning_rate: ${optimizer.params.learning_rate}
+    # 5% (200 step) warmup matched to max_train_steps=4000.
+    warmup_steps: 200
+    min_lr_scale: 0.1
+training:
+  # Oracle length keeps per-sample sequences short → keep stage1 settings (max_tokens=2000, max_batch_size=32, accum=1).
+  gradient_accumulation_steps: 1
+  noise_type: mask
+  max_tokens: 2000
+  max_batch_size: 32
+  mixed_precision: bf16
+  enable_tf32: true
+  seed: 10086
+  # 4000 step ≈ 2 epochs (sufficient for warm-start). Short training avoids PAD overfitting.
+  max_train_steps: 4000
+  overfit_one_batch: false
+  cond_dropout_prob: 0.1
+  min_masking_rate: 0.0
+  label_smoothing: 0.0
+  max_grad_norm: 1
+  guidance_scale: 1.5
+  generation_timesteps: 12
+eval:
+  block_size: 1
+  threshold: 0.9
+  answer_len: 150

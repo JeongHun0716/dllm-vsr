@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.ipynb_checkpoints/
+
+# Training / eval outputs
+exp/
+eval_logs/
+wandb/
+
+# Checkpoints (hosted on Hugging Face Hub: jh-y/dllm-vsr)
+ckpt/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+*.swp

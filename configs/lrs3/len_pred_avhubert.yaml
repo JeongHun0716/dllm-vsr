@@ -1,0 +1,67 @@
+# Lightweight length predictor — AvHubert backbone version.
+# Backbone swap only: USR2 huge 1280 → AvHubert large_vox 1024. Everything else identical.
+experiment:
+  project: dllm-vsr-lenpred
+  name: lrs3_len_pred_avhubert
+  output_dir: exp/runs/lrs3_len_pred_avhubert
+  save_every: 1000
+  eval_every: 500
+  log_every: 20
+model:
+  enc_dim: 1024            # AvHubert large_vox
+  hidden: 384
+  n_layers: 2
+  n_heads: 6
+  ffn_dim: 1536
+  dropout: 0.1
+  len_max: 150
+  visual_encoder:
+    type: avhubert
+    ckpt_path: ckpt/avhubert/large_vox_iter5.pt
+    enc_dim: 1024
+  # used by the dataset to compute K (tokenizer required)
+  dllm:
+    tokenizer_path: Dream-org/Dream-v0-Instruct-7B
+dataset:
+  task_type: vsr
+  backend: raw
+  vsr:
+    manifest_root: manifest/433h
+    max_video_frames: 500
+    modalities:
+    - video
+  raw_video:
+    crop_size: 88
+    normalize_mean: 0.421
+    normalize_std: 0.165
+    time_mask_window: 10
+    time_mask_stride: 25
+    train_crop: random
+    enable_time_mask: true
+  dataloader:
+    num_workers: 4
+    pin_memory: true
+    persistent_workers: true
+optimizer:
+  name: adamw
+  params:
+    learning_rate: 1.0e-04
+    scale_lr: false
+    beta1: 0.9
+    beta2: 0.999
+    weight_decay: 0.01
+    epsilon: 1.0e-08
+lr_scheduler:
+  scheduler: cosine
+  params:
+    learning_rate: ${optimizer.params.learning_rate}
+    warmup_steps: 500
+    min_lr_scale: 0.1
+training:
+  max_tokens: 4000
+  max_batch_size: 64
+  mixed_precision: bf16
+  enable_tf32: true
+  seed: 10086
+  max_train_steps: 5000
+  max_grad_norm: 1.0

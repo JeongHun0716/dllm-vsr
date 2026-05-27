@@ -1,0 +1,21 @@
+# Core DL stack
+torch>=2.1
+torchvision>=0.16
+
+# HF / training infra
+transformers==4.46.0
+accelerate
+deepspeed
+peft
+safetensors
+
+# Config + logging
+omegaconf
+wandb
+
+# Eval
+editdistance
+tqdm
+
+# AV-HuBERT encoder (uses fairseq + omegaconf)
+fairseq

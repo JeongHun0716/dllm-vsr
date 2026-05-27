@@ -1,0 +1,91 @@
+wandb:
+  resume: auto
+  mode: offline
+experiment:
+  project: dllm-vsr
+  name: lrs3_usr2huge_dream
+  output_dir: exp/runs/lrs3_usr2huge_dream
+  save_every: 2000
+  eval_every: 2000
+  generate_every: 2000
+  log_every: 20
+  log_grad_norm_every: 100
+  resume_from_checkpoint: false
+model:
+  use_oracle_length: true
+  visual_encoder:
+    type: usr2
+    backbone: huge
+    ckpt_path: ckpt/usr2/usr2_huge_pretrain.pth
+    enc_dim: 1280
+  adapter:
+    kernel: 2
+    stride: 2
+    num_fc_layers: 2
+    hidden_dim: 3584
+  dllm:
+    type: dream
+    pretrained_model_path: Dream-org/Dream-v0-Instruct-7B
+    tokenizer_path: Dream-org/Dream-v0-Instruct-7B
+    hidden_size: 3584
+  lora:
+    enable: true
+    r: 16
+    alpha: 32
+    dropout: 0.05
+    target_modules: all-linear
+  torch_dtype: bfloat16
+  gradient_checkpointing: true
+dataset:
+  task_type: vsr
+  backend: raw
+  vsr:
+    manifest_root: manifest/433h
+    max_video_frames: 500
+    modalities:
+    - video
+  raw_video:
+    crop_size: 88
+    normalize_mean: 0.421
+    normalize_std: 0.165
+    time_mask_window: 10
+    time_mask_stride: 25
+  dataloader:
+    num_workers: 4
+    pin_memory: true
+    persistent_workers: true
+optimizer:
+  name: adamw
+  params:
+    learning_rate: 0.0001
+    scale_lr: false
+    beta1: 0.9
+    beta2: 0.999
+    weight_decay: 0.01
+    epsilon: 1.0e-08
+lr_scheduler:
+  scheduler: cosine
+  params:
+    learning_rate: ${optimizer.params.learning_rate}
+    warmup_steps: 1000
+    min_lr_scale: 0.1
+training:
+  gradient_accumulation_steps: 1
+  noise_type: mask
+  max_tokens: 2000
+  max_batch_size: 32
+  mixed_precision: bf16
+  enable_tf32: true
+  seed: 10086
+  max_train_steps: 50000
+  overfit_one_batch: false
+  cond_dropout_prob: 0.1
+  min_masking_rate: 0.0
+  label_smoothing: 0.0
+  max_grad_norm: 1
+  guidance_scale: 1.5
+  generation_timesteps: 12
+eval:
+  block_size: 1
+  threshold: 0.9
+  answer_len: 150
