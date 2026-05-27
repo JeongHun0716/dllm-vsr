@@ -9,6 +9,7 @@ This repository contains the PyTorch implementation of the following paper:
 
 ## Introduction
 DLLM-VSR adapts a discrete Diffusion Large Language Model (DLLM, Dream-7B) to visual speech recognition. Instead of left-to-right autoregressive generation, it iteratively denoises a fixed-length masked canvas via confidence-based unmasking, then reranks length-guided candidates to produce the final transcript.
+<img width="1748" height="946" alt="image" src="https://github.com/user-attachments/assets/1cde2f06-55d5-4b6c-b05a-b1510d42a8aa" />
 
 
 ## Setup
