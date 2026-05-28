@@ -4,7 +4,7 @@ This repository contains the PyTorch implementation of the following paper:
 > **Diffusion Large Language Models for Visual Speech Recognition**<br>
 > <br>
 > Authors: Jeong Hun Yeo, Chae Won Kim, Hyeongseop Rha, Yong Man Ro<br>
-> **Paper Link**: [http://arxiv.org/abs/XXXX.XXXXX](http://arxiv.org/abs/XXXX.XXXXX)
+> **Paper Link**: [http://arxiv.org/abs/2605.28456](http://arxiv.org/abs/2605.28456)
 
 
 ## Introduction
@@ -119,7 +119,7 @@ Stage-2 configs (`configs/lrs3/*_v2.yaml`) reference a stage-1 checkpoint via `e
 @article{yeo2026dllmvsr,
   title={Diffusion Large Language Models for Visual Speech Recognition},
   author={Yeo, Jeong Hun and Kim, Chae Won and Rha, Hyeongseop and Ro, Yong Man},
-  journal={arXiv preprint arXiv:XXXX.XXXXX},
+  journal={arXiv preprint arXiv:2605.28456},
   year={2026}
 }
 ```
