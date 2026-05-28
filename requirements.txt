@@ -1,21 +1,37 @@
 # Core DL stack
-torch>=2.1
-torchvision>=0.16
+torch==2.5.1
+torchvision==0.20.1
+torchaudio==2.5.1
+numpy==1.23.5
+scipy==1.13.1
 
 # HF / training infra
 transformers==4.46.0
-accelerate
-deepspeed
-peft
-safetensors
+tokenizers==0.20.3
+huggingface-hub==0.36.0
+accelerate==1.10.1
+deepspeed==0.18.3
+peft==0.17.1
+safetensors==0.7.0
+sentencepiece==0.2.1
+
+# Video / I/O
+opencv-python==4.11.0.86
+av==15.1.0
+soundfile==0.13.1
+python-speech-features==0.6
+einops==0.8.1
 
 # Config + logging
-omegaconf
-wandb
+omegaconf==2.0.6        # pinned for fairseq compatibility
+hydra-core==1.0.7       # pinned for fairseq compatibility
+wandb==0.23.1
 
 # Eval
-editdistance
-tqdm
+editdistance==0.8.1
+torchmetrics==1.6.2
+tqdm==4.67.1
 
-# AV-HuBERT encoder (uses fairseq + omegaconf)
-fairseq
+# AV-HuBERT encoder uses fairseq. Install separately (editable):
+#   git clone https://github.com/facebookresearch/fairseq && cd fairseq && pip install --editable ./
+# (pinned omegaconf/hydra-core above match fairseq's requirements.)
