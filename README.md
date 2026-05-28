@@ -20,8 +20,15 @@ conda activate dllm-vsr
 git clone https://github.com/JeongHun0716/dllm-vsr
 cd dllm-vsr
 
-pip install torch==2.1.2 torchvision==0.16.2 --index-url https://download.pytorch.org/whl/cu121
+# PyTorch (CUDA 11.8; adjust the cu* tag if your driver differs)
+pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu118
+
+# Other Python dependencies
 pip install -r requirements.txt
+
+# fairseq (needed by the AV-HuBERT encoder; install as editable from upstream)
+git clone https://github.com/facebookresearch/fairseq
+cd fairseq && pip install --editable ./ && cd ..
 ```
 
 
