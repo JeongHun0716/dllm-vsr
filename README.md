@@ -15,11 +15,6 @@ Integrated Vision Language Lab, KAIST
 
 This repository contains the official PyTorch implementation of **DLLM-VSR**, the first Diffusion Large Language Model (DLLM)-based framework for Visual Speech Recognition.
 
-## Highlights
-- **Flexible-order decoding for lip reading**: replaces left-to-right autoregressive decoding with masked denoising, committing high-confidence tokens first and using them as bidirectional context for visually ambiguous ones.
-- **Two-stage masked-denoising training** separates visual-to-text content alignment from length modeling, and **length-guided candidate decoding** resolves the fixed-canvas length uncertainty.
-- **19.4% WER on LRS3** with only its 433h labeled data (21.9% with AV-HuBERT), **39.9% / 46.1% on WildVSR** out of domain — all with faster-than-real-time decoding at the default search radius.
-
 ## News
 - **2026-09**: Code and checkpoints released. Paper accepted at **EMNLP 2026** ([arXiv](https://arxiv.org/abs/2605.28456)).
 
