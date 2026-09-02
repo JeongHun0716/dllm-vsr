@@ -1,0 +1,19 @@
+# Data-parallel multi-GPU config for INFERENCE/eval sharding (no DeepSpeed).
+# Each of the 8 processes loads the full model on its own GPU and processes a
+# disjoint shard of the dataset (shard = process rank). Use with eval scripts
+# that derive shard_idx/num_shards from accelerator.process_index/num_processes.
+compute_environment: LOCAL_MACHINE
+distributed_type: MULTI_GPU
+downcast_bf16: 'no'
+gpu_ids: all
+machine_rank: 0
+main_training_function: main
+mixed_precision: bf16
+num_machines: 1
+num_processes: 8
+rdzv_backend: static
+same_network: true
+tpu_env: []
+tpu_use_cluster: false
+tpu_use_sudo: false
+use_cpu: false

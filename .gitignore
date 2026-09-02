@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.ipynb_checkpoints/
+
+# Training / eval outputs
+exp/
+eval_logs/
+wandb/
+
+# Checkpoints (hosted on Hugging Face Hub: jh-y/dllm-vsr)
+ckpt/
+
+# Local HF model card draft
+HF_MODEL_CARD.md
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# LRS2 assets are not part of the public release
+configs/lrs2/
+manifest/lrs2/
