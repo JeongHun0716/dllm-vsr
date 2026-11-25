@@ -28,7 +28,7 @@
 # see scripts/eval/rerank/run_tuning_pipeline.sh.
 #
 # ETA on 8x RTX 3090: ~15-25 minutes (LRS3)
-set -e
+set -eo pipefail   # pipefail: a failed `accelerate launch | tee` must stop the script
 
 BACKBONE=${BACKBONE:-usr2}     # usr2 | avhubert
 DATASET=${DATASET:-lrs3}       # lrs3 | wildvsr
@@ -89,9 +89,29 @@ echo "[$(date +%H:%M:%S)] Step 1 done"
 echo
 echo "[$(date +%H:%M:%S)] Step 2: length-guided candidate decoding on ${SPLIT}  (${BACKBONE}, accelerate 8-way data-parallel on GPU 0-7)"
 mkdir -p "${TEST_OUT}"
-if compgen -G "${TEST_OUT}/shard_*_raw.jsonl" > /dev/null; then
-    echo "  [skip] ${TEST_OUT} already has shards"
+# dream_canvas_pinned_eos.py writes shard_XX_of_YY.json after a shard's last
+# utterance. Shards are complete only if all YY shards (one YY) have both files.
+shards_complete() {
+    local raw n="" i base
+    for raw in "${TEST_OUT}"/shard_*_of_*_raw.jsonl; do
+        [[ -f "${raw}" ]] || return 1
+        base=${raw%_raw.jsonl}
+        [[ -n "${n}" ]] || n=${base##*_of_}
+        [[ "${base##*_of_}" == "${n}" ]] || return 1   # mixed shard counts
+    done
+    [[ -n "${n}" ]] || return 1
+    for (( i = 0; i < 10#${n}; i++ )); do
+        base=$(printf '%s/shard_%02d_of_%s' "${TEST_OUT}" "${i}" "${n}")
+        [[ -f "${base}_raw.jsonl" && -f "${base}.json" ]] || return 1
+    done
+}
+if shards_complete; then
+    echo "  [skip] ${TEST_OUT} already has complete shards (delete them to re-decode)"
 else
+    if compgen -G "${TEST_OUT}/shard_*_raw.jsonl" > /dev/null; then
+        echo "  [warn] ${TEST_OUT} has an incomplete set of shards (e.g. an interrupted run); re-decoding"
+    fi
+    rm -f "${TEST_OUT}"/shard_*_raw.jsonl "${TEST_OUT}"/shard_*_of_*.json
     # One command, 8 processes: accelerate assigns each process a GPU and a rank;
     # the script derives shard_idx/num_shards from the rank (no manual loop needed).
     accelerate launch --config_file accelerate_configs/8_gpu.yaml \
